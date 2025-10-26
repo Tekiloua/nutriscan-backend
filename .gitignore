@@ -1,0 +1,5 @@
+node_modules
+arduino_main.ino
+main_claude.py
+main_esp32.py
+.env

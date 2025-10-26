@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "^5.1.0",
     "mariadb": "^3.4.5",
+    "play-sound": "^1.1.6",
     "sequelize": "^6.37.7",
     "socket.io": "^4.8.1"
   },

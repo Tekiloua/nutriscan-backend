@@ -1,24 +1,32 @@
 import express from "express";
 import { initDb } from "./lib/db.js";
+import poidsRouter from "./routes/poids.route.js";
 import alimentRouter from "./routes/aliment.route.js";
 import { Poids } from "./lib/db.js";
-
+import player from "play-sound";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import { exec } from "child_process";
 
 const app = express();
+const play = player({ player: "mpg123" });
 const server = http.createServer(app);
 
-app.use(cors({
-  origin: "http://localhost:5173"
-}));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 app.use(express.json());
 
+app.use("/api/poids", poidsRouter);
+app.use("/api/aliments", alimentRouter);
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // ton app React
+    origin: "*", // ton app React
     methods: ["GET", "POST"],
   },
 });
@@ -66,9 +74,55 @@ app.delete("/delete/:id", async (req, res) => {
   }
 });
 
+// Quand un utilisateur va sur /
+app.get("/carotte", (req, res) => {
+  exec("mpg123 src/song/carotte.mp3", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Erreur : ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`STDERR : ${stderr}`);
+      return;
+    }
+  });
 
-app.use("/api/poids", alimentRouter);
+  res.send("Carotte ajouté au serveur !");
+});
+
+app.get("/pomme-de-terre", (req, res) => {
+  exec("mpg123 src/song/pomme_de_terre.mp3", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Erreur : ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`STDERR : ${stderr}`);
+      return;
+    }
+  });
+
+  res.send("Pomme de terre ajouté au serveur !");
+});
+
+app.get("/pomme-de-terre-delete", (req, res) => {
+  exec(
+    "mpg123 src/song/pomme_de_terre_supprime.mp3",
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Erreur : ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`STDERR : ${stderr}`);
+        return;
+      }
+    }
+  );
+
+  res.send("Pomme de terre ajouté au serveur !");
+});
 
 server.listen(8080, () => {
-  //   initDb();
+  // initDb();
 });
