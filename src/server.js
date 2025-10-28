@@ -2,7 +2,7 @@ import express from "express";
 import { initDb } from "./lib/db.js";
 import poidsRouter from "./routes/poids.route.js";
 import alimentRouter from "./routes/aliment.route.js";
-import { Poids } from "./lib/db.js";
+import { Poids, Aliment } from "./lib/db.js";
 import player from "play-sound";
 import http from "http";
 import { Server } from "socket.io";
@@ -21,13 +21,10 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/poids", poidsRouter);
-app.use("/api/aliments", alimentRouter);
-
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "*", // ton app React
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE"],
   },
 });
 
@@ -44,37 +41,43 @@ io.on("connection", (socket) => {
 });
 
 async function sendData(socket) {
-  const poidsData = await Poids.findAll();
-  socket.emit("data_update", poidsData);
+  const alimentsData = await Aliment.findAll();
+  socket.emit("data_update", alimentsData);
 }
 
 // 🚀 Exemple route pour ajouter un produit
-app.post("/add", async (req, res) => {
-  try {
-    await Poids.create(req.body);
-    const poidsData = await Poids.findAll();
-    io.emit("data_update", poidsData); // <-- ici !
-    res.json({ message: "Produit ajouté avec succès" });
-  } catch (err) {
-    console.error("Erreur ajout :", err);
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-});
+// app.post("/add", async (req, res) => {
+//   try {
+//     await Poids.create(req.body);
+//     const poidsData = await Poids.findAll();
+//     io.emit("data_update", poidsData); // <-- ici !
+//     res.json({ message: "Produit ajouté avec succès" });
+//   } catch (err) {
+//     console.error("Erreur ajout :", err);
+//     res.status(500).json({ error: "Erreur serveur" });
+//   }
+// });
 
-app.delete("/delete/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Poids.destroy({ where: { id } });
-    const poidsData = await Poids.findAll();
-    io.emit("data_update", poidsData); // ⚡ Mise à jour temps réel
-    res.json({ message: "Produit supprimé avec succès" });
-  } catch (err) {
-    console.error("Erreur suppression :", err);
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-});
-
+// app.delete("/delete/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     await Poids.destroy({ where: { id } });
+//     const poidsData = await Poids.findAll();
+//     io.emit("data_update", poidsData); // ⚡ Mise à jour temps réel
+//     res.json({ message: "Produit supprimé avec succès" });
+//   } catch (err) {
+//     console.error("Erreur suppression :", err);
+//     res.status(500).json({ error: "Erreur serveur" });
+//   }
+// });
 // Quand un utilisateur va sur /
+
+
+
+app.use("/api/poids", poidsRouter);
+app.use("/api/aliments", alimentRouter);
+
+
 app.get("/carotte", (req, res) => {
   exec("mpg123 src/song/carotte.mp3", (error, stdout, stderr) => {
     if (error) {

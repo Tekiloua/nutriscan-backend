@@ -8,5 +8,23 @@ export const AlimentModel = (sequelize, DataTypes) => {
     name: {
       type: DataTypes.STRING,
     },
+    category: {
+      type: DataTypes.STRING,
+    },
+    glucide: {
+      type: DataTypes.INTEGER,
+    },
+    protide: {
+      type: DataTypes.INTEGER,
+    },
+    magnesium: {
+      type: DataTypes.INTEGER,
+    },
+    water: {
+      type: DataTypes.INTEGER,
+    },
+    others: {
+      type: DataTypes.INTEGER,
+    },
   });
 };
